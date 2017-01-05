@@ -1,0 +1,6 @@
+ebook/
+*.swp
+*.orig
+tmp/
+*.pyc
+__pycache__
