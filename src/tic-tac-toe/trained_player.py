@@ -1,4 +1,5 @@
 import random
+import json
 
 class TrainedPlayer:
     def __init__(self, step_value=0.1, exploratory_percent=0.1, name='Trained'):
@@ -86,7 +87,8 @@ class TrainedPlayer:
 
 
     def store_state(self, filename):
-        pass
+        with open(filename, 'w') as fp:
+            json.dump(self.state_values, fp, sort_keys=True, indent=4)
 
     def load_state(self, filename):
         pass

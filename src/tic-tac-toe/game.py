@@ -73,9 +73,16 @@ if __name__ == "__main__":
     game = Game()
     _, trained_one = game.train(count=10000, player_two=TrainedPlayer(name='one'))
     _, trained_two = game.train(count=100000, player_one=trained_one, player_two=TrainedPlayer(name='two'))
+
+    print("\nTraining complete, AI vs Random")
     game.play(player_one=trained_one)
+
+    print("\nAI vs Human")
     game.play(player_one=trained_one, player_two=HumanPlayer())
+
+    print("\nAI vs AI, 50 times")
     for i in range(50):
         game.play(player_one=trained_one, player_two=trained_two, trace=False)
 
+    trained_one.store_state('./state/trained_one_latest.json')
 
