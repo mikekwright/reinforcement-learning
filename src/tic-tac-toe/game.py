@@ -5,6 +5,7 @@ import time
 from board import Board
 from random_player import RandomPlayer
 from trained_player import TrainedPlayer
+from human_player import HumanPlayer
 
 
 class Game:
@@ -73,6 +74,7 @@ if __name__ == "__main__":
     _, trained_one = game.train(count=10000, player_two=TrainedPlayer(name='one'))
     _, trained_two = game.train(count=100000, player_one=trained_one, player_two=TrainedPlayer(name='two'))
     game.play(player_one=trained_one)
+    game.play(player_one=trained_one, player_two=HumanPlayer())
     for i in range(50):
         game.play(player_one=trained_one, player_two=trained_two, trace=False)
 
