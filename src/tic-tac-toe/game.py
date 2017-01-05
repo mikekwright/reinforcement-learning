@@ -71,7 +71,7 @@ class Game:
 
 if __name__ == "__main__": 
     game = Game()
-    _, trained_one = game.train(count=10000, player_two=TrainedPlayer(name='one'))
+    _, trained_one = game.train(count=100000, player_two=TrainedPlayer(name='one'))
     _, trained_two = game.train(count=100000, player_one=trained_one, player_two=TrainedPlayer(name='two'))
 
     print("\nTraining complete, AI vs Random")

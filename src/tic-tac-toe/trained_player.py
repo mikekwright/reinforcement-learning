@@ -2,13 +2,14 @@ import random
 import json
 
 class TrainedPlayer:
-    def __init__(self, step_value=0.1, exploratory_percent=0.1, name='Trained'):
+    def __init__(self, step_value=0.1, exploratory_percent=0.3, name='Trained'):
         self.step_value = step_value
         self.state_values = {}
         self.exploratory_percent = exploratory_percent
         self.loss_value = 0
         self.draw_value = .25
         self.default_value = .50
+        # self.default_value = 1
         self.win_value = 1
         self.name = name
 
