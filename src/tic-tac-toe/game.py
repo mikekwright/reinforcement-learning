@@ -4,15 +4,16 @@ import time
 
 from board import Board
 from random_player import RandomPlayer
-from trained_player import TrainedPlayer
 from human_player import HumanPlayer
+from first_trained_player import FirstTrainedPlayer
+from value_trained_player import ValueTrainedPlayer
 
 
 class Game:
     def __init__(self):
         pass
 
-    def train(self, count=100, player_one=RandomPlayer(), player_two=TrainedPlayer()):
+    def train(self, count=100, player_one=RandomPlayer(), player_two=FirstTrainedPlayer()):
         first = player_one
         second = player_two
         for i in range(count+1):
@@ -71,8 +72,10 @@ class Game:
 
 if __name__ == "__main__": 
     game = Game()
-    _, trained_one = game.train(count=100000, player_two=TrainedPlayer(name='one'))
-    _, trained_two = game.train(count=100000, player_one=trained_one, player_two=TrainedPlayer(name='two'))
+    # _, trained_one = game.train(count=10000, player_one=HumanPlayer(), player_two=ValueTrainedPlayer(name='one'))
+    _, trained_one = game.train(count=100000, player_two=ValueTrainedPlayer(name='one'))
+    # _, trained_one = game.train(count=100000, player_two=FirstTrainedPlayer(name='one'))
+    _, trained_two = game.train(count=10000, player_one=trained_one, player_two=FirstTrainedPlayer(name='two'))
 
     print("\nTraining complete, AI vs Random")
     game.play(player_one=trained_one)

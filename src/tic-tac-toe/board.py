@@ -4,16 +4,20 @@ class Board:
                       ' ', ' ', ' ',
                       ' ', ' ', ' ']
 
-    def clone_move(self, move):
-        clone = list(self.board)
-        clone.apply_move(move)
-        return clone
+    def clone_move(self, piece, move):
+        clone_board = Board()
+        clone_board.board = list(self.board)
+        clone_board.apply_move(move=move, piece=piece)
+        return clone_board
 
     def open_spots(self):
         return [index for index, option in enumerate(self.board) if option == ' ']
 
     def board_state(self):
         return ''.join(self.board)
+
+    def opposite_piece(self, piece):
+        return 'X' if piece == 'O' else 'O'
 
     def apply_move(self, move, piece):
         if self.board[move] == ' ':

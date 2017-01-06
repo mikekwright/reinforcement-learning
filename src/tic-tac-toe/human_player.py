@@ -6,7 +6,7 @@ class HumanPlayer:
         self.piece = piece
 
     def make_move(self, board):
-        # board.print_board()
+        board.print_board()
         option = input("You are %s, what is your move (0 top left): " % self.piece)
         return int(option)
         

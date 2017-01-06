@@ -1,7 +1,7 @@
 import random
 import json
 
-class TrainedPlayer:
+class FirstTrainedPlayer:
     def __init__(self, step_value=0.1, exploratory_percent=0.3, name='Trained'):
         self.step_value = step_value
         self.state_values = {}
