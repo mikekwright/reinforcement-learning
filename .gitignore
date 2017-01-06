@@ -4,3 +4,4 @@ ebook/
 tmp/
 *.pyc
 __pycache__
+.env/
