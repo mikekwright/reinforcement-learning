@@ -22,9 +22,9 @@ class Game:
 
             self.__play_game(print_board=False, o=first, x=second, train=True)
 
-            tmp = first 
-            first = second 
-            second = tmp
+            # tmp = first 
+            # first = second 
+            # second = tmp
 
         return (player_one, player_two)
 
@@ -73,9 +73,11 @@ class Game:
 if __name__ == "__main__": 
     game = Game()
     # _, trained_one = game.train(count=10000, player_one=HumanPlayer(), player_two=ValueTrainedPlayer(name='one'))
-    _, trained_one = game.train(count=100000, player_two=ValueTrainedPlayer(name='one'))
-    # _, trained_one = game.train(count=100000, player_two=FirstTrainedPlayer(name='one'))
-    _, trained_two = game.train(count=10000, player_one=trained_one, player_two=FirstTrainedPlayer(name='two'))
+    # _, trained_one = game.train(count=100000, player_two=ValueTrainedPlayer(name='one'))
+    # _, trained_one = game.train(count=100000, player_two=ValueTrainedPlayer(name='one'))
+    _, trained_one = game.train(count=100000, player_two=FirstTrainedPlayer(name='one'))
+    # _, trained_two = game.train(count=10000, player_one=trained_one, player_two=FirstTrainedPlayer(name='two'))
+    _, trained_two = game.train(count=10000, player_one=trained_one, player_two=ValueTrainedPlayer(name='two'))
 
     print("\nTraining complete, AI vs Random")
     game.play(player_one=trained_one)
