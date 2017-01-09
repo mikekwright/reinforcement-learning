@@ -1,21 +1,35 @@
 from logging import debug, info
+import random
 
 
 class MinMaxPlayer:
-    def __init__(self, name='MinMax', step_value=0.2):
+    def __init__(self, name='MinMax', step_value=0.2, make_imperfect=False, random_percent=0.25):
         info('Creating MinMax player named {}'.format(name))
         self.name = name
         self.player_num = None
         self.step_value = step_value
+        self.imperfect = make_imperfect
+        self.random_percent = random_percent
 
     def start_game(self, player_num=0):
         debug('Starting game with RandomPlayer {} as number {}'.format(self.name, player_num))
         self.player_num = player_num
 
     def make_move(self, board):
-        move, value = self.__min_max(board, use_max=True)
-        debug('Move {} with value {}'.format(move, value))
-        return move
+        if self.imperfect and random.random() < self.random_percent:
+            return self.__random_move(board)
+        else:
+            move, value = self.__min_max(board, use_max=True)
+            debug('Move {} with value {}'.format(move, value))
+            return move
+
+    def __random_move(self, board):
+        spots = board.moves()
+        if len(spots) <= 0:
+            return -1
+
+        selection = random.randint(0, len(spots)-1)
+        return spots[selection]
 
     def __min_max(self, board, use_max=True):
         moves = board.moves()
