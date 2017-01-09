@@ -31,12 +31,13 @@ class FirstTrainedPlayer:
             move = board.random_move()
         else:
             move = self.__select_best_move(board)
-        self.move_history.append((board.board_state(), move))
+        self.move_history.append((board.state(), move))
+        debug('Selected move {} for FirstTrained {}'.format(move, self.name))
         return move
 
     def __select_best_move(self, board):
-        board_state = board.board_state()
-        open_spots = board.open_spots()
+        board_state = board.state()
+        open_spots = board.moves()
         if board_state not in self.state_values:
             self.state_values[board_state] = {} 
 
@@ -46,19 +47,19 @@ class FirstTrainedPlayer:
                 state_values[spot] = self.default_value
 
         best_move_value = self.loss_value
-        choosen_move = -1
+        chosen_move = -1
         for move in state_values:
             if state_values[move] >= best_move_value:
-                choosen_move = move
+                chosen_move = move
                 best_move_value = state_values[move]
                 
-        return choosen_move
+        return int(chosen_move)
 
     def game_over(self, final_board):
         if not self.training:
             return
 
-        if final_board.does_piece_win(piece=self.piece):
+        if final_board.does_player_win(player=self.player_num):
             adjust_value = self.win_value
         elif final_board.is_draw():
             adjust_value = self.draw_value

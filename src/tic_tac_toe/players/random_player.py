@@ -1,7 +1,5 @@
 from logging import debug, info
 
-import random
-
 
 class RandomPlayer:
     def __init__(self, name='Random'):

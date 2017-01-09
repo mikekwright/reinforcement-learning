@@ -1,3 +1,4 @@
+from collections import deque
 from logging import debug, info
 from colorama import init, Fore, Back, Style
 init()
@@ -5,12 +6,17 @@ init()
 
 class Trainer:
     @staticmethod
-    def train(iterations, plays, game, players):
-        info(Fore.LIGHTYELLOW_EX + 'Strating training for {} iterations'.format(iterations) + Style.RESET_ALL)
+    def train(iterations, plays, game, players, rotate_players=False):
+        info(Fore.LIGHTYELLOW_EX +
+             'Strating training for {} iterations - rotating {}'.format(iterations, rotate_players)
+             + Style.RESET_ALL)
+        players = deque(players)
         for iteration in range(iterations):
             info(Fore.LIGHTRED_EX + 'Running iteration {} of {}'.format(iteration+1, iterations) + Style.RESET_ALL)
             Trainer.__train_each_player(game=game, plays=plays, players=players)
             debug('Completed iteration {}'.format(iteration))
+            if rotate_players:
+                players.rotate()
         debug('Completed all {} training iterations'.format(iterations))
 
     @staticmethod

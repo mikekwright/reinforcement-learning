@@ -1,4 +1,5 @@
 import random
+from logging import debug, info
 from colorama import init, Fore, Style
 init()
 
@@ -29,7 +30,7 @@ class Board:
         return str(self.turn) + '-' + ''.join([str(l) for l in self.board])
 
     def random_move(self):
-        spots = board.open_spots()
+        spots = self.moves()
         if len(spots) <= 0:
             return -1
 
@@ -54,6 +55,7 @@ class Board:
             return self.default_value
 
     def apply_move(self, move):
+        debug('Applying move {}'.format(move))
         if self.board[move] == 0:
             self.board[move] = self.turn
         else:
