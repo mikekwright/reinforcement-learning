@@ -16,6 +16,7 @@ class ValueTrainedPlayer:
         self.name = name
         self.count = 0
         self.convergence_rate = convergence_rate
+        self.training = False
 
     def start_game(self, player_num=1):
         self.player_num = player_num
@@ -26,7 +27,7 @@ class ValueTrainedPlayer:
             self.step_value *= .8
 
     def __best_move(self, board):
-        possible_moves = board.open_spots()
+        possible_moves = board.moves()
         debug('Selecting best move from {}'.format(str(possible_moves)))
 
         best_move = None
@@ -52,12 +53,14 @@ class ValueTrainedPlayer:
 
         move_board = board.clone()
         move_board.apply_move(selected_move)
-        self.state_values[move_board.state()] = move_board.value()
+        key = move_board.state(turn=self.player_num)
+        if not key in self.state_values:
+            self.state_values[key] = move_board.value()
 
         if not exploratory and self.last_move_state is not None:
             self.__update_last_move_value(move_board)
 
-        self.last_move_state = move_board.state()
+        self.last_move_state = move_board.state(turn=self.player_num)
         return selected_move
 
     def __update_last_move_value(self, selected_move_board):
@@ -65,7 +68,7 @@ class ValueTrainedPlayer:
             return
 
         original_value = self.__get_value_of_key(self.last_move_state)
-        move_value = self.__get_value_of_key(selected_move_board.state())
+        move_value = self.__get_value_of_board(selected_move_board)
         adjusted_value = original_value + self.step_value * (move_value - original_value)
         self.state_values[self.last_move_state] = adjusted_value
 
@@ -75,7 +78,7 @@ class ValueTrainedPlayer:
         self.__update_last_move_value(final_board)
 
     def __get_value_of_board(self, board):
-        key = board.state()
+        key = board.state(turn=self.player_num)
         if key not in self.state_values:
             self.state_values[key] = board.value(turn=self.player_num)
         return self.__get_value_of_key(key)
@@ -103,3 +106,6 @@ class ValueTrainedPlayer:
     def disable_training(self):
         debug('Disabled training for ValueTrainedPlayer {}'.format(self.name))
         self.training = False
+
+    def can_train(self):
+        return True

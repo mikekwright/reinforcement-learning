@@ -31,3 +31,6 @@ class RandomPlayer:
 
     def disable_training(self):
         debug('Request to disable training for HumanPlayer {}'.format(self.name))
+
+    def can_train(self):
+        return False

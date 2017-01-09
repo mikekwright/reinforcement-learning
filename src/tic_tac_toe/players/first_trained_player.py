@@ -100,3 +100,6 @@ class FirstTrainedPlayer:
 
     def print_state(self):
         pprint(self.state_values)
+
+    def can_train(self):
+        return True

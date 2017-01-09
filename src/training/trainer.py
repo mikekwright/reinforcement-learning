@@ -24,6 +24,11 @@ class Trainer:
         for training_player in players:
             info(Fore.LIGHTGREEN_EX + 'Training player {}'.format(training_player.name) + Style.RESET_ALL)
             static_players = [p for p in players if p is not training_player]
+            if not training_player.can_train():
+                info(Fore.LIGHTBLUE_EX +
+                     'Player {} cannot be trained, skipping'.format(training_player.name) +
+                     Style.RESET_ALL)
+                continue
             training_player.enable_training()
             for s in static_players:
                 s.disable_training()

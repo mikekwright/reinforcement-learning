@@ -10,6 +10,7 @@ class MinMaxPlayer:
         self.step_value = step_value
         self.imperfect = make_imperfect
         self.random_percent = random_percent
+        self.state_cache = {}
 
     def start_game(self, player_num=0):
         debug('Starting game with RandomPlayer {} as number {}'.format(self.name, player_num))
@@ -24,9 +25,15 @@ class MinMaxPlayer:
             return move
 
     def __min_max(self, board, use_max=True):
+        board_state = board.state()
+        if board_state in self.state_cache:
+            return self.state_cache[board_state]
+
         moves = board.moves()
         if board.game_over():
-            return -1, board.value(turn=self.player_num)
+            result = (-1, board.value(turn=self.player_num))
+            self.state_cache[board_state] = result
+            return result
 
         # Optimization for the first move
         if len(moves) >= 7:
@@ -36,7 +43,10 @@ class MinMaxPlayer:
                 selected = random.randint(0, len(optimized) - 1)
                 move = optimized[selected]
                 if move in moves:
-                    return move, board.value(turn=self.player_num)
+                    result = (move, board.value(turn=self.player_num))
+                    self.state_cache[board_state] = result
+                    #return move, board.value(turn=self.player_num)
+                    return result
 
         selected_move = None
         selected_value = None
@@ -60,7 +70,9 @@ class MinMaxPlayer:
                     selected_move = move
 
         debug('selected_move {} - selected_value {} - state {}'.format(selected_move, selected_value, board.state()))
-        return selected_move, selected_value
+        result = (selected_move, selected_value)
+        self.state_cache[board_state] = result
+        return result
 
     def game_over(self, final_board):
         debug('Game over for MinMax {}'.format(self.name))
@@ -79,3 +91,6 @@ class MinMaxPlayer:
 
     def disable_training(self):
         debug('Request to disable training for MinMax {}'.format(self.name))
+
+    def can_train(self):
+        return False

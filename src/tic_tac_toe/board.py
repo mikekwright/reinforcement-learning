@@ -26,8 +26,9 @@ class Board:
     def moves(self):
         return [index for index, option in enumerate(self.board) if option == 0]
 
-    def state(self):
-        return str(self.turn) + '-' + ''.join([str(l) for l in self.board])
+    def state(self, turn=None):
+        turn = self.turn if turn is None else turn
+        return str(turn) + '-' + ''.join([str(l) for l in self.board])
 
     def random_move(self):
         spots = self.moves()
