@@ -1,22 +1,30 @@
+from logging import debug, info, warn
+from pprint import pprint
+
 import random
 import json
 
+
 class FirstTrainedPlayer:
-    def __init__(self, step_value=0.1, exploratory_percent=0.3, name='Trained'):
+    def __init__(self, step_value=0.1, exploratory_percent=0.3, name='FirstTrained'):
         self.step_value = step_value
-        self.state_values = {}
         self.exploratory_percent = exploratory_percent
+        self.name = name
+        self.__setup_defaults()
+
+    def __setup_defaults(self):
+        self.state_values = {}
         self.loss_value = 0
         self.draw_value = .25
         self.default_value = .50
-        # self.default_value = 1
         self.win_value = 1
-        self.name = name
+        self.player_num = None
+        self.training = False
 
-    def start_game(self, piece='X', train=False):
-        self.piece = piece
+    def start_game(self, player_num=0):
+        debug('Starting game with player {} as number {}'.format(self.name, player_num))
+        self.player_num = player_num
         self.move_history = []
-        self.train = train
 
     def make_move(self, board):
         if self.train and random.random() < self.exploratory_percent:
@@ -44,10 +52,8 @@ class FirstTrainedPlayer:
                 choosen_move = move
                 best_move_value = state_values[move]
                 
-
         return choosen_move
 
-        
     def __make_random_move(self, board):
         spots = board.open_spots()
         if len(spots) <= 0:
@@ -56,12 +62,10 @@ class FirstTrainedPlayer:
         selection = random.randint(0, len(spots)-1)
         return spots[selection]
 
-
     def game_over(self, final_board):
-        if not self.train:
+        if not self.training:
             return
 
-        adjust_value = self.default_value
         if final_board.does_piece_win(piece=self.piece):
             adjust_value = self.win_value
         elif final_board.is_draw():
@@ -69,9 +73,6 @@ class FirstTrainedPlayer:
         else:
             adjust_value = self.loss_value
         self.__adjust_state_values(value_prime=adjust_value)
-
-    def print_state(self):
-        print(self.state_values)
 
     def __adjust_state_values(self, value_prime):
         while len(self.move_history) > 0:
@@ -86,11 +87,23 @@ class FirstTrainedPlayer:
             self.state_values[last_state][last_move] = adjusted_value
             value_prime = adjusted_value
 
-
     def store_state(self, filename):
+        info('Saving state for FirstTrainedPlayer {} - file {}'.format(self.name, filename))
         with open(filename, 'w') as fp:
             json.dump(self.state_values, fp, sort_keys=True, indent=4)
 
     def load_state(self, filename):
-        pass
+        info('Loading state for FirstTrainedPlayer {} - file {}'.format(self.name, filename))
+        with open(filename, 'r') as fp:
+            self.state_values = json.load(fp)
 
+    def enable_training(self):
+        debug('Enabled training for FirstTrainedPlayer {}'.format(self.name))
+        self.training = True
+
+    def disable_training(self):
+        debug('Disabled training for FirstTrainedPlayer {}'.format(self.name))
+        self.training = False
+
+    def print_state(self):
+        pprint(self.state_values)

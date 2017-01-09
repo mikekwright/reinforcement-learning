@@ -1,5 +1,6 @@
 import random
 import json
+from pprint import pprint
 
 class ValueTrainedPlayer:
     def __init__(self, step_value=0.2, exploratory_percent=0.15, name='ValueTrained'):
@@ -13,13 +14,14 @@ class ValueTrainedPlayer:
         self.win_value = 1
         self.name = name
         self.count = 0
+        self.debug_enabled = False
 
     def start_game(self, piece='X', train=False):
         self.piece = piece
         self.train = train
         self.last_move_state = None
         self.count += 1
-        if self.count % 10000 == 0:
+        if self.count % 100000 == 0:
             self.exploratory_percent = self.exploratory_percent * .6
             # self.step_value = self.step_value * .8
 
@@ -27,12 +29,11 @@ class ValueTrainedPlayer:
         spots = board.open_spots()
         if len(spots) <= 0:
             return -1
-        
         selection = random.randint(0, len(spots)-1)
         return spots[selection]
 
     def __get_value(self, board):
-        key = self.__get_state_key(board, self.piece) 
+        key = self.__get_state_key(board, self.piece)
         # print("Get value: ", key)
         return self.__get_state_value(key, board, self.piece)
 
@@ -42,6 +43,8 @@ class ValueTrainedPlayer:
 
     def __best_move(self, board):
         possible_moves = board.open_spots()
+        if self.debug_enabled:
+            print("Selecting best move", possible_moves)
         # print(possible_moves)
         best_move = -1
         best_value = -1000
@@ -51,6 +54,8 @@ class ValueTrainedPlayer:
             if move_value > best_value:
                 best_value = move_value
                 best_move = move
+            if self.debug_enabled:
+                print(board_with_move.board_state(),move_value)
             # print(self.state_values)
         return best_move
 
@@ -69,7 +74,6 @@ class ValueTrainedPlayer:
 
     def make_move(self, board):
         self.__update_move_value(board)
-        
         if random.random() < self.exploratory_percent:
             selected_move = self.__random_move(board)
             exploratory = True
@@ -82,6 +86,9 @@ class ValueTrainedPlayer:
         self.last_move_state = (self.__get_state_key(cloned_board, self.piece), exploratory)
 
         return selected_move
+
+    def debug(self, enabled):
+        self.debug_enabled = enabled
 
     def game_over(self, final_board):
         self.__update_move_value(final_board)
@@ -100,7 +107,7 @@ class ValueTrainedPlayer:
             # updated_value = current_value + self.step_value*(primed_value - current_value)
             # self.state_values[history_key] = updated_value
             # primed_value = updated_value
-        # print(self.state_values)
+        # pprint(self.state_values)
 
     def __get_state_value(self, key, board, piece):
         if key not in self.state_values:
@@ -113,7 +120,6 @@ class ValueTrainedPlayer:
             else:
                 self.state_values[key] = self.default_value
         return self.state_values[key]
-                
 
     def store_state(self, filename):
         with open(filename, 'w') as fp:
