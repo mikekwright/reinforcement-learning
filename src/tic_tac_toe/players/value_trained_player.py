@@ -1,132 +1,105 @@
 import random
 import json
 from pprint import pprint
+from logging import debug, info, error
+
 
 class ValueTrainedPlayer:
-    def __init__(self, step_value=0.2, exploratory_percent=0.15, name='ValueTrained'):
+    def __init__(self, step_value=0.2, exploratory_percent=0.15, convergence_rate=10000, name='ValueTrained'):
         self.step_value = step_value
         self.state_values = {}
         self.exploratory_percent = exploratory_percent
         self.loss_value = 0
-        # self.draw_value = .25
         self.draw_value = .50
         self.default_value = .50
         self.win_value = 1
         self.name = name
         self.count = 0
-        self.debug_enabled = False
+        self.convergence_rate = convergence_rate
 
-    def start_game(self, piece='X', train=False):
-        self.piece = piece
-        self.train = train
+    def start_game(self, player_num=1):
+        self.player_num = player_num
         self.last_move_state = None
         self.count += 1
-        if self.count % 100000 == 0:
-            self.exploratory_percent = self.exploratory_percent * .6
-            # self.step_value = self.step_value * .8
-
-    def __random_move(self, board):
-        spots = board.open_spots()
-        if len(spots) <= 0:
-            return -1
-        selection = random.randint(0, len(spots)-1)
-        return spots[selection]
-
-    def __get_value(self, board):
-        key = self.__get_state_key(board, self.piece)
-        # print("Get value: ", key)
-        return self.__get_state_value(key, board, self.piece)
-
-    def __get_state_key(self, board, piece):
-        # return piece + '-' + board.board_state()
-        return board.board_state()
+        if self.count % self.convergence_rate == 0:
+            self.exploratory_percent *= .6
+            self.step_value *= .8
 
     def __best_move(self, board):
         possible_moves = board.open_spots()
-        if self.debug_enabled:
-            print("Selecting best move", possible_moves)
-        # print(possible_moves)
-        best_move = -1
-        best_value = -1000
+        debug('Selecting best move from {}'.format(str(possible_moves)))
+
+        best_move = None
+        best_value = None
         for move in possible_moves:
-            board_with_move = board.clone_move(move=move, piece=self.piece)
-            move_value = self.__get_value(board_with_move)
-            if move_value > best_value:
+            board_with_move = board.clone()
+            board_with_move.apply_move(move)
+            move_value = self.__get_value_of_board(board_with_move)
+            if best_move is None or move_value > best_value:
                 best_value = move_value
                 best_move = move
-            if self.debug_enabled:
-                print(board_with_move.board_state(),move_value)
-            # print(self.state_values)
+
+            debug('move {} value {} new_best_move {}'.format(move, move_value, best_move))
         return best_move
 
-    def __update_move_value(self, board):
-        # print("Updating value ", self.last_move_state)
-        if self.last_move_state != None:
-            key, exploratory = self.last_move_state
-            last_move_value = self.state_values.get(key, self.default_value)
-            if exploratory:
-                return
-
-            board_value = self.__get_value(board)
-            updated_move_value = last_move_value + self.step_value*(board_value - last_move_value)
-            # print("key: ", key, "from ", last_move_value, "to ", updated_move_value)
-            self.state_values[key] = updated_move_value
-
     def make_move(self, board):
-        self.__update_move_value(board)
         if random.random() < self.exploratory_percent:
-            selected_move = self.__random_move(board)
+            selected_move = board.random_move()
             exploratory = True
         else:
             selected_move = self.__best_move(board)
             exploratory = False
 
-        # Add our move
-        cloned_board = board.clone_move(move=selected_move, piece=self.piece)
-        self.last_move_state = (self.__get_state_key(cloned_board, self.piece), exploratory)
+        move_board = board.clone()
+        move_board.apply_move(selected_move)
+        self.state_values[move_board.state()] = move_board.value()
 
+        if not exploratory and self.last_move_state is not None:
+            self.__update_last_move_value(move_board)
+
+        self.last_move_state = move_board.state()
         return selected_move
 
-    def debug(self, enabled):
-        self.debug_enabled = enabled
+    def __update_last_move_value(self, selected_move_board):
+        if not self.training:
+            return
+
+        original_value = self.__get_value_of_key(self.last_move_state)
+        move_value = self.__get_value_of_key(selected_move_board.state())
+        adjusted_value = original_value + self.step_value * (move_value - original_value)
+        self.state_values[self.last_move_state] = adjusted_value
 
     def game_over(self, final_board):
-        self.__update_move_value(final_board)
-        # print("Over: ", self.history)
-        # final_state_key = self.__get_state_key(final_board, self.piece)
-        # final_value = self.__get_state_value(final_state_key, final_board, self.piece)
+        if self.last_move_state is None:
+            error('Game is over and last move state does not exist')
+        self.__update_last_move_value(final_board)
 
-        # primed_value = final_value
-        # self.history.reverse()
-        # # print("Reverse: ", self.history)
-        # for history_key in self.history:
-            # if history_key not in self.state_values:
-                # current_value = self.default_value
-            # else:
-                # current_value = self.state_values[history_key]
-            # updated_value = current_value + self.step_value*(primed_value - current_value)
-            # self.state_values[history_key] = updated_value
-            # primed_value = updated_value
-        # pprint(self.state_values)
-
-    def __get_state_value(self, key, board, piece):
+    def __get_value_of_board(self, board):
+        key = board.state()
         if key not in self.state_values:
-            if board.is_draw():
-                self.state_values[key] = self.draw_value
-            elif board.does_piece_win(piece):
-                self.state_values[key] = self.win_value
-            elif board.does_piece_win(board.opposite_piece(piece)):
-                self.state_values[key] = self.loss_value
-            else:
-                self.state_values[key] = self.default_value
+            self.state_values[key] = board.value(turn=self.player_num)
+        return self.__get_value_of_key(key)
+
+    def __get_value_of_key(self, key):
         return self.state_values[key]
 
     def store_state(self, filename):
+        info('Saving state for ValueTrainedPlayer {} - file {}'.format(self.name, filename))
         with open(filename, 'w') as fp:
             json.dump(self.state_values, fp, sort_keys=True, indent=4)
 
     def load_state(self, filename):
-        pass
+        info('Loading state for ValueTrainedPlayer {} - file {}'.format(self.name, filename))
+        with open(filename, 'r') as fp:
+            self.state_values = json.load(fp)
 
     def print_state(self):
-        print(self.state_values)
+        pprint(self.state_values)
+
+    def enable_training(self):
+        debug('Enabled training for ValueTrainedPlayer {}'.format(self.name))
+        self.training = True
+
+    def disable_training(self):
+        debug('Disabled training for ValueTrainedPlayer {}'.format(self.name))
+        self.training = False
