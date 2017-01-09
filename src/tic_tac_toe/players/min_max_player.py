@@ -28,13 +28,23 @@ class MinMaxPlayer:
         if len(spots) <= 0:
             return -1
 
-        selection = random.randint(0, len(spots)-1)
+        selection = random.randint(0, len(spots) - 1)
         return spots[selection]
 
     def __min_max(self, board, use_max=True):
         moves = board.moves()
         if board.game_over():
             return -1, board.value(turn=self.player_num)
+
+        # Optimization for the first move
+        if len(moves) >= 7:
+            debug('Start of gaming using random selection optimization')
+            optimized = [0, 2, 4, 6, 8]
+            while True:
+                selected = random.randint(0, len(optimized) - 1)
+                move = optimized[selected]
+                if move in moves:
+                    return move, board.value(turn=self.player_num)
 
         selected_move = None
         selected_value = None
