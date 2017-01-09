@@ -14,12 +14,7 @@ class RandomPlayer:
         self.player_num = player_num
 
     def make_move(self, board):
-        spots = board.moves()
-        if len(spots) <= 0:
-            return -1
-        
-        selection = random.randint(0, len(spots)-1)
-        return spots[selection]
+        return board.random_move()
 
     def game_over(self, final_board):
         pass

@@ -27,8 +27,8 @@ class FirstTrainedPlayer:
         self.move_history = []
 
     def make_move(self, board):
-        if self.train and random.random() < self.exploratory_percent:
-            move = self.__make_random_move(board)
+        if self.training and random.random() < self.exploratory_percent:
+            move = board.random_move()
         else:
             move = self.__select_best_move(board)
         self.move_history.append((board.board_state(), move))
@@ -53,14 +53,6 @@ class FirstTrainedPlayer:
                 best_move_value = state_values[move]
                 
         return choosen_move
-
-    def __make_random_move(self, board):
-        spots = board.open_spots()
-        if len(spots) <= 0:
-            return -1
-        
-        selection = random.randint(0, len(spots)-1)
-        return spots[selection]
 
     def game_over(self, final_board):
         if not self.training:

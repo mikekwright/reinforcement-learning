@@ -1,3 +1,4 @@
+import random
 from colorama import init, Fore, Style
 init()
 
@@ -26,6 +27,14 @@ class Board:
 
     def state(self):
         return str(self.turn) + '-' + ''.join([str(l) for l in self.board])
+
+    def random_move(self):
+        spots = board.open_spots()
+        if len(spots) <= 0:
+            return -1
+
+        selection = random.randint(0, len(spots)-1)
+        return spots[selection]
 
     def value(self, turn=0):
         turn = turn if turn != 0 else self.turn

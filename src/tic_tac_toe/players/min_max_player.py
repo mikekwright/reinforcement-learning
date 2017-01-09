@@ -17,19 +17,11 @@ class MinMaxPlayer:
 
     def make_move(self, board):
         if self.imperfect and random.random() < self.random_percent:
-            return self.__random_move(board)
+            return board.random_move()
         else:
             move, value = self.__min_max(board, use_max=True)
             debug('Move {} with value {}'.format(move, value))
             return move
-
-    def __random_move(self, board):
-        spots = board.moves()
-        if len(spots) <= 0:
-            return -1
-
-        selection = random.randint(0, len(spots) - 1)
-        return spots[selection]
 
     def __min_max(self, board, use_max=True):
         moves = board.moves()
