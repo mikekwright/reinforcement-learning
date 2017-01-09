@@ -16,10 +16,15 @@ class Game:
 
         if board.is_draw():
             debug('Game Over - Draw')
+            return 0
         elif board.does_player_win(player=1):
             debug('Game Over, X Wins ({})'.format(player_two.name))
+            return 1
         elif board.does_player_win(player=2):
             debug('Game Over, O Wins ({})'.format(player_one.name))
+            return 2
+        else:
+            return -1
 
     def __play_game(self, player_one, player_two):
         player_one.start_game(player_num=1)
