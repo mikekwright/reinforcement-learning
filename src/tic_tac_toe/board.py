@@ -3,25 +3,46 @@ init()
 
 
 class Board:
-    def __init__(self, board=None, player_one='X', player_two='O'):
+    def __init__(self, board=None, turn=1, player_one='X', player_two='O'):
         if board is None:
             self.board = [0, 0, 0,
                           0, 0, 0,
                           0, 0, 0]
         else:
             self.board = board
-        self.turn = 1
+        self.turn = turn
         self.player_one = player_one
         self.player_two = player_two
+        self.win_value = 1
+        self.loss_value = 0
+        self.draw_value = 0.5
+        self.default_value = 0.5
 
     def clone(self):
-        return Board(list(self.board))
+        return Board(board=list(self.board), turn=self.turn)
 
     def moves(self):
         return [index for index, option in enumerate(self.board) if option == 0]
 
     def state(self):
-        return str(self.turn) + ''.join(self.board)
+        return str(self.turn) + '-' + ''.join([str(l) for l in self.board])
+
+    def value(self, turn=0):
+        turn = turn if turn != 0 else self.turn
+
+        if turn == 1:
+            opponent = 2
+        else:
+            opponent = 1
+
+        if self.does_player_win(player=turn):
+            return self.win_value
+        elif self.does_player_win(player=opponent):
+            return self.loss_value
+        elif self.is_draw():
+            return self.draw_value
+        else:
+            return self.default_value
 
     def apply_move(self, move):
         if self.board[move] == 0:
