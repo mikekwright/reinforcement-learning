@@ -1,0 +1,2 @@
+model_checkpoint_path: "supervised_deep_trained_minmax_state"
+all_model_checkpoint_paths: "supervised_deep_trained_minmax_state"

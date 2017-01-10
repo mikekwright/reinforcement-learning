@@ -2,11 +2,15 @@ import os
 import sys
 import logging
 from logging import debug, info
+from collections import deque
 
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
+# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
 from tic_tac_toe import Game
-from tic_tac_toe.players import HumanPlayer, MinMaxPlayer, FirstTrainedPlayer, RandomPlayer, ValueTrainedPlayer
+from tic_tac_toe.players import HumanPlayer, MinMaxPlayer, FirstTrainedPlayer, RandomPlayer, ValueTrainedPlayer, SupervisedDeepPlayer
 
 
 def play_human_player_two():
@@ -74,12 +78,22 @@ def play_value_vs_minmax_manytimes(times=1000):
             loss += 1
 
 
-if __name__ == '__main__':
-    # logging.basicConfig(level=logging.DEBUG)
-    logging.basicConfig(level=logging.INFO)
+def play_human_and_supervised():
+    game = Game()
+    player_one = SupervisedDeepPlayer(name='Super')
+    player_one.load_state(os.path.join(os.path.dirname(__file__), 'state', 'supervised',
+                                       'supervised_deep_trained_minmax_state'))
+    player_two = HumanPlayer(name='Me')
+    player_queue = deque([player_one, player_two])
+    while True:
+        game.play(players=player_queue)
+        player_queue.rotate()
 
+
+if __name__ == '__main__':
     # play_human_player_one()
     # play_human_player_two()
     # play_human_and_first_trained()
     # play_human_and_value_trained()
-    play_value_vs_minmax_manytimes()
+    # play_value_vs_minmax_manytimes()
+    play_human_and_supervised()
