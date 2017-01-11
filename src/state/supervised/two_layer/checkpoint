@@ -1,0 +1,2 @@
+model_checkpoint_path: "random_trained"
+all_model_checkpoint_paths: "random_trained"

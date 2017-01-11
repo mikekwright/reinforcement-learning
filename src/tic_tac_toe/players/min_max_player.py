@@ -3,7 +3,7 @@ import random
 
 
 class MinMaxPlayer:
-    def __init__(self, name='MinMax', step_value=0.2, make_imperfect=False, random_percent=0.25):
+    def __init__(self, name='MinMax', step_value=0.2, make_imperfect=False, random_percent=0.25, cache=True):
         info('Creating MinMax player named {}'.format(name))
         self.name = name
         self.player_num = None
@@ -11,6 +11,7 @@ class MinMaxPlayer:
         self.imperfect = make_imperfect
         self.random_percent = random_percent
         self.state_cache = {}
+        self.cache = cache
 
     def start_game(self, player_num=0):
         debug('Starting game with RandomPlayer {} as number {}'.format(self.name, player_num))
@@ -26,17 +27,18 @@ class MinMaxPlayer:
 
     def __min_max(self, board, use_max=True):
         board_state = board.state()
-        if board_state in self.state_cache:
+        if self.cache and board_state in self.state_cache:
             return self.state_cache[board_state]
 
         moves = board.moves()
         if board.game_over():
             result = (-1, board.value(turn=self.player_num))
-            self.state_cache[board_state] = result
+            if self.cache:
+                self.state_cache[board_state] = result
             return result
 
         # Optimization for the first move
-        if len(moves) >= 7:
+        if len(moves) >= 8:
             debug('Start of gaming using random selection optimization')
             optimized = [0, 2, 4, 6, 8]
             while True:
@@ -44,7 +46,8 @@ class MinMaxPlayer:
                 move = optimized[selected]
                 if move in moves:
                     result = (move, board.value(turn=self.player_num))
-                    self.state_cache[board_state] = result
+                    if self.cache:
+                        self.state_cache[board_state] = result
                     #return move, board.value(turn=self.player_num)
                     return result
 
@@ -71,7 +74,8 @@ class MinMaxPlayer:
 
         debug('selected_move {} - selected_value {} - state {}'.format(selected_move, selected_value, board.state()))
         result = (selected_move, selected_value)
-        self.state_cache[board_state] = result
+        if self.cache:
+            self.state_cache[board_state] = result
         return result
 
     def game_over(self, final_board):
