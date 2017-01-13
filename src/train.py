@@ -83,9 +83,10 @@ def train_supervised_trained_with_random():
     game = Game()
 
     info('Training supervised with random 10000 times (as first and second player)')
-    player_one = SupervisedDeepPlayer(version='three_layer', train_size=10000)
+    # player_one = SupervisedDeepPlayer(version='three_layer', train_size=10000)
+    player_one = SupervisedDeepPlayer(version='two_layer', train_size=10000)
     player_two = RandomPlayer()
-    Trainer.train(iterations=2, plays=100000, game=game, players=[player_one, player_two], rotate_players=True)
+    Trainer.train(iterations=1, plays=50000, game=game, players=[player_one, player_two], rotate_players=True)
     player_one.store_state(os.path.join(os.path.dirname(__file__), 'state', 'supervised', 'two_layer', 'random_trained'))
 
     # info('Training supervised with imperfect min-max 10000 times (as first and second player)')

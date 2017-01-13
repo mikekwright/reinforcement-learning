@@ -13,6 +13,9 @@ class MinMaxPlayer:
         self.state_cache = {}
         self.cache = cache
 
+    def clear_cache(self):
+        self.state_cache = {}
+
     def start_game(self, player_num=0):
         debug('Starting game with RandomPlayer {} as number {}'.format(self.name, player_num))
         self.player_num = player_num
@@ -21,7 +24,7 @@ class MinMaxPlayer:
         if self.imperfect and random.random() < self.random_percent:
             return board.random_move()
         else:
-            move, value = self.__min_max(board, use_max=True)
+            move, value, level = self.__min_max(board, use_max=True)
             debug('Move {} with value {}'.format(move, value))
             return move
 
@@ -32,7 +35,7 @@ class MinMaxPlayer:
 
         moves = board.moves()
         if board.game_over():
-            result = (-1, board.value(turn=self.player_num))
+            result = (-1, board.value(turn=self.player_num), 0)
             if self.cache:
                 self.state_cache[board_state] = result
             return result
@@ -40,12 +43,15 @@ class MinMaxPlayer:
         # Optimization for the first move
         if len(moves) >= 8:
             debug('Start of gaming using random selection optimization')
-            optimized = [0, 2, 4, 6, 8]
+            center = 4
+            if center in moves:
+                return (center, board.value(), 0)
+            corners = [0, 2, 6, 8]
             while True:
-                selected = random.randint(0, len(optimized) - 1)
-                move = optimized[selected]
+                selected = random.randint(0, len(corners) - 1)
+                move = corners[selected]
                 if move in moves:
-                    result = (move, board.value(turn=self.player_num))
+                    result = (move, board.value(turn=self.player_num), 0)
                     if self.cache:
                         self.state_cache[board_state] = result
                     #return move, board.value(turn=self.player_num)
@@ -53,27 +59,32 @@ class MinMaxPlayer:
 
         selected_move = None
         selected_value = None
+        selected_move_level = 0
         for move in moves:
-            debug('looking at move {} - state; {}'.format(move, board.state()))
             cloned = board.clone()
             cloned.apply_move(move)
-            (_, new_value) = self.__min_max(board=cloned, use_max=not use_max)
+            (_, new_value, move_level) = self.__min_max(board=cloned, use_max=not use_max)
+            debug('looking at move {} - state; {} - depth {}'.format(move, board.state(), move_level))
 
             if selected_move is None:
                 selected_move = move
                 selected_value = new_value
+                selected_move_level = move_level
+                continue
 
             if use_max:
-                if new_value > selected_value:
+                if (new_value == selected_value and move_level < selected_move_level) or (new_value > selected_value):
                     selected_value = new_value
                     selected_move = move
+                    selected_move_level = move_level
             else:
-                if new_value < selected_value:
+                if (new_value == selected_value and move_level < selected_move_level) or (new_value < selected_value):
                     selected_value = new_value
                     selected_move = move
+                    selected_move_level = move_level
 
         debug('selected_move {} - selected_value {} - state {}'.format(selected_move, selected_value, board.state()))
-        result = (selected_move, selected_value)
+        result = (selected_move, selected_value, selected_move_level+1)
         if self.cache:
             self.state_cache[board_state] = result
         return result

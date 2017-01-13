@@ -7,8 +7,8 @@ from pprint import pprint
 
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
-# logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+# logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 from tic_tac_toe import Game
 from tic_tac_toe.players import HumanPlayer, MinMaxPlayer, FirstTrainedPlayer, RandomPlayer, ValueTrainedPlayer, \
@@ -80,6 +80,23 @@ def play_value_vs_minmax_manytimes(times=1000):
             loss += 1
 
 
+def play_human_vs_minmax():
+    game = Game()
+    player_one = HumanPlayer()
+    player_two = MinMaxPlayer()
+    while True:
+        game.play(players=[player_one, player_two])
+
+
+def play_two_layer_vs_human():
+    game = Game()
+    player_one = SupervisedDeepPlayer(version='two_layer')
+    player_one.load_state(os.path.join(os.path.dirname(__file__), 'state', 'supervised', 'two_layer', 'random_trained'))
+    player_two = HumanPlayer(name='Me')
+    while True:
+        game.play(players=[player_one, player_two])
+
+
 def play_human_and_supervised():
     game = Game()
     player_one = SupervisedDeepPlayer(name='Super', version='two_layer')
@@ -107,9 +124,11 @@ def play_human_and_supervised():
 
 
 if __name__ == '__main__':
+    # play_human_vs_minmax()
     # play_human_player_one()
-    play_human_player_two()
+    # play_human_player_two()
     # play_human_and_first_trained()
     # play_human_and_value_trained()
     # play_value_vs_minmax_manytimes()
     # play_human_and_supervised()
+    play_two_layer_vs_human()

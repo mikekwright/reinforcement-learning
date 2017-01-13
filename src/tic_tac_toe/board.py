@@ -28,7 +28,8 @@ class Board:
 
     def state(self, turn=None):
         turn = self.turn if turn is None else turn
-        return str(turn) + '-' + ''.join([str(l) for l in self.board])
+        # return str(turn) + '-' + ''.join([str(l) for l in self.board])
+        return ''.join([str(l) for l in self.board])
 
     def random_move(self):
         spots = self.moves()

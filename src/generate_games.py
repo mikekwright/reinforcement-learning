@@ -37,14 +37,17 @@ class GenerateGames:
         return plays
 
     def create_game_history(self, player_one_filename, player_two_filename):
+        # player_one = MinMaxPlayer(cache=False)
         player_one = MinMaxPlayer()
-        player_two = RandomPlayer()
+        # player_two = RandomPlayer()
+        player_two = MinMaxPlayer()
         one_history = self.run_games(player_one, player_two, keep=1)
         with open(player_one_filename, 'w') as one_fp:
             # json.dump(one_history, fp=one_fp, sort_keys=False, indent=4)
             for game in one_history:
                 one_fp.write(str(game) + '\n')
 
+        # player_one = MinMaxPlayer(cache=False)
         two_history = self.run_games(player_two, player_one, keep=2)
         with open(player_two_filename, 'w') as two_fp:
             json.dump(two_history, fp=two_fp, sort_keys=False, indent=4)
