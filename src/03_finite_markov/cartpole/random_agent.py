@@ -14,6 +14,7 @@ Past experiments
 """
 class CartPoleAgent:
     def __init__(self, display=Display(), seed=int(random.random()*100000)):
+    # def __init__(self, display=Display(), seed=3033):
         self.__action_count = 0
         self.__seed = seed
         self.d = display
@@ -25,6 +26,9 @@ class CartPoleAgent:
 
     def start_episode(self):
         self.param = np.random.rand(4) * 2 -1
+        # self.param = [0.09709162, 0.4032167, 0.59367842, 0.36232268]
+        # self.param = [0.09, 0.40, 0.59, 0.36]
+        # self.param = [0.1, 0.4, 0.6, 0.4]
         self.__action_count = 0
 
     def select_action(self, observation, reward, done, info):
