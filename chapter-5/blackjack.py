@@ -5,19 +5,13 @@ import random
 import numpy as np
 
 from collections import defaultdict
-from pprint import pprint
+from argparse import ArgumentParser
 
-import matplotlib
-matplotlib.use('TkAgg')
-
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
-fig = plt.figure()
 
 CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 DECK = CARDS * 4
 
+fig = None
 
 class BlackJack:
     def __init__(self, infinite_deck=False):
@@ -183,19 +177,26 @@ def render(data, useable_ace=False, plot=111, title='Plot'):
 
     X, Y, Z, = [], [], []
     for dealer in range(2, 11):
-        # for hand_value in range(12, 22):
-        for hand_value in range(4, 22):
+        for hand_value in range(12, 22):
+        # for hand_value in range(4, 22):
             Y.append(hand_value)
             X.append(dealer)
             Z.append(np.mean(data[(hand_value, dealer, useable_ace)]))
 
     ax.plot_trisurf(X, Y, Z)
 
-if __name__ == '__main__':
-    game = BlackJack()
-    # player = UserBlackJackPlayer()
-    # game.play_game(player)
+def run_experiment(count=500000):
+    global fig
 
+    import matplotlib
+    matplotlib.use('TkAgg')
+
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+
+    fig = plt.figure()
+
+    game = BlackJack(infinite_deck=True)
     player = AIBlackJackPlayer()
     for i in range(500000):
         if i % 10000 == 0:
@@ -209,3 +210,21 @@ if __name__ == '__main__':
     render(player._values, useable_ace=True, plot=222, title='500000 Usable Ace')
     render(player._values, useable_ace=False, plot=224, title='500000 No Usable')
     plt.show()
+
+def play_as_user():
+    game = BlackJack()
+    player = UserBlackJackPlayer()
+    game.play_game(player)
+
+def get_args():
+    parser = ArgumentParser()
+    parser.add_argument('--user', action='store_true', default=False, help='Play as a user')
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = get_args()
+    if args.user:
+        play_as_user()
+    else:
+        run_experiment()
