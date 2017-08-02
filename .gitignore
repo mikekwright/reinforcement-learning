@@ -1,3 +1,12 @@
 .venv
 __pycache__
+ebook/
+*.swp
+*.orig
+tmp/
+*.pyc
+.env/
+.idea
+.cache
+.out
 activate
