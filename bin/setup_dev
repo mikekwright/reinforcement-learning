@@ -7,11 +7,12 @@ VENV_DIR=.venv
 
 if [ ! -d "$VENV_DIR" ]; then
     if ! which brew; then
-        echo "Need to install swig package, default to using brew, if you have another method install first"
+        echo "Need to install swig and ffmepg packages, default to using brew but brew not found"
         exit 1
     fi
 
     brew install swig
+    brew install ffmpeg
 
     python3 -m venv --copies --prompt reinforcement $VENV_DIR
     ln -s $PWD/$VENV_DIR/bin/activate $PWD/activate
