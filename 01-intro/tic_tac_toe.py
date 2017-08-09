@@ -119,14 +119,23 @@ class PerfectPlayer:
 
 
 class RandomPlayer:
+    def __init__(self):
+        self._count = 0
+        self._win = 0
+
     def start(self, piece):
-        pass
+        self._count += 1
 
     def make_move(self, state, actions):
         return random.choice(actions)
 
     def finish(self, state, score):
-        pass
+        if score == 1:
+            self._win += 1
+
+    def display_results(self):
+        print(f'Random player results wins: {self._win} total: {self._count}')
+        print(f'Win percentage {self._win/self._count}')
 
 
 class InteractivePlayer:
