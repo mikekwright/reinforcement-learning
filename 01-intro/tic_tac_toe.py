@@ -14,8 +14,8 @@ class Board:
     COLS = [(0, 3, 6), (1, 4, 7), (2, 5, 8)]
     DIAGS = [(0, 4, 8), (2, 4, 6)]
 
-    def __init__(self):
-        self.reset()
+    def __init__(self, board=None):
+        self._board = list(board or [0] * 9)
 
     @property
     def board(self):
@@ -107,38 +107,54 @@ class Game:
         player_two.finish(state=final_board, score=player_two_score)
 
 
-class PerfectPlayer:
-    def start(self, piece):
-        pass
-
-    def make_move(self, state, actions):
-        pass
-
-    def finish(self, state, score):
-        pass
-
-
 class RandomPlayer:
+    """
+    A random player you can use to train against
+    """
     def __init__(self):
         self._count = 0
         self._win = 0
+        self._draw = 0
+        self._loss = 0
 
     def start(self, piece):
+        """
+        Notify the user of starting a new game
+        """
         self._count += 1
 
     def make_move(self, state, actions):
+        """
+        Allow the random user to select and action from list of actions
+        """
         return random.choice(actions)
 
     def finish(self, state, score):
+        """
+        This method is called when the game is finished, the score is one of three values
+          * 1 for win
+          * 0 for draw
+          * -1 for loss
+        """
         if score == 1:
             self._win += 1
+        elif score == 0:
+            self._draw += 1
+        elif score == -1:
+            self._loss += 1
 
     def display_results(self):
-        print(f'Random player results wins: {self._win} total: {self._count}')
-        print(f'Win percentage {self._win/self._count}')
+        """
+        Display the results for the random player (just wins, draws, losses)
+        """
+        print(f'Random player - Wins: {self._win}, Draws: {self._draw}, Loss: {self._loss}')
+        print(f'Win percentage {(self._win/self._count) * 100}', end='\n\n')
 
 
 class InteractivePlayer:
+    """
+    An interactive game you can play
+    """
     @staticmethod
     def _map_piece_to_char(piece):
         if piece == 1:
@@ -158,9 +174,15 @@ class InteractivePlayer:
         print(f'------------')
 
     def start(self, piece):
-        print(f'Welcome to Tic-Tac-Toe, you are player {InteractivePlayer._map_piece_to_char(piece)}')
+        """
+        Start a new game for the user
+        """
+        print(f'Welcome to Tic-Tac-Toe, you are {InteractivePlayer._map_piece_to_char(piece)}')
 
     def make_move(self, state, actions):
+        """
+        Send the user a selection for a state and list of actions
+        """
         InteractivePlayer._print_board(state)
         valid_move = None
         while valid_move is None:
@@ -175,6 +197,12 @@ class InteractivePlayer:
         return valid_move
 
     def finish(self, state, score):
+        """
+        This method is called when the game is finished, the score is one of three values
+          * 1 for win
+          * 0 for draw
+          * -1 for loss
+        """
         InteractivePlayer._print_board(state)
         if score == 0:
             print('Well, looks like you were in a draw')
