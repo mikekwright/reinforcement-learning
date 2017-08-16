@@ -44,20 +44,20 @@ class KArmedBandit:
     The KArmedBandit class is a class that contians the logic around a k-armed bandit problem
       (described in README)
     """
-    def __init__(self, k, true_q_of_a=None, variance=1):
+    def __init__(self, k, variance=1):
         self._k = k
-        self._true_q_of_a = true_q_of_a or [np.random.normal(0, 1) for i in range(k)]
         self._variance = variance
         self._reward_history = [(0, 0) for i in range(k)]
         self._step_rewards = []
 
-    def _action_reward(self, action):
-        mean = self._true_q_of_a[action]
+    def _action_reward(self, action, true_q_of_a):
+        mean = true_q_of_a[action]
         variance = self._variance
         return np.random.normal(mean, variance)
 
     def _start(self):
         self._step_rewards = []
+        self._reward_history = [(0, 0) for i in range(self._k)]
 
     def _update_action_rewards(self, action, new_reward):
         reward_history = self._reward_history[action]
@@ -83,7 +83,7 @@ class KArmedBandit:
         """
         return tuple(self._step_rewards)
 
-    def run(self, steps=1000, policy=greedy_policy):
+    def run(self, q_values, steps=1000, policy=greedy_policy):
         """
         The run method actual goes through the entire bandit problem for
           the number of specified steps
@@ -92,7 +92,7 @@ class KArmedBandit:
 
         for _ in range(steps):
             action = policy(self.values)
-            new_reward = self._action_reward(action)
+            new_reward = self._action_reward(action, q_values)
             self._step_rewards.append(new_reward)
             self._update_action_rewards(action, new_reward)
 

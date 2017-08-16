@@ -25,7 +25,8 @@ class KArmedBanditPlot:
                 run_averages.append(np.mean(step_reward))
             X.append(np.mean(run_averages))
 
-        self._plt.plot(X)
+        print(len(X))
+        self._plt.plot(X, label=policy)
 
     def render(self):
         self._plt.show()
