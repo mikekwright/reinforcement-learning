@@ -21,4 +21,8 @@ If you want to play the simple blackjack game, you can do so with this command
     cd chapter-5
     python blackjack.py --user
 
+## Other Materials
+
+[Medium Series - 8 Part](https://medium.com/@awjuliani/super-simple-reinforcement-learning-tutorial-part-1-fd544fab149)  
+[Hitchhiker's Guide to ML](https://medium.freecodecamp.org/the-hitchhikers-guide-to-machine-learning-algorithms-in-python-bfad66adb378)  
 
